@@ -1,0 +1,24 @@
+{
+  "name": "odin-blog-api",
+  "version": "1.0.0",
+  "description": "Blogging API to practice creating RESTful APIs and using JWTs.",
+  "homepage": "https://github.com/WitherMite/odin-blog-api#readme",
+  "bugs": {
+    "url": "https://github.com/WitherMite/odin-blog-api/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WitherMite/odin-blog-api.git"
+  },
+  "license": "ISC",
+  "author": "WitherMite",
+  "type": "module",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "express.js": "^1.0.0"
+  }
+}

@@ -15,18 +15,19 @@
   "type": "module",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js",
+    "build": "npx prisma generate && npx prisma migrate deploy"
   },
   "dependencies": {
-    "@prisma/adapter-pg": "^7.0.0",
-    "@prisma/client": "^7.0.0",
+    "@prisma/client": "^6.17.0",
+    "bcryptjs": "^3.0.3",
     "dotenv": "^17.2.3",
     "express.js": "^1.0.0",
     "pg": "^8.16.3"
   },
   "devDependencies": {
-    "@types/node": "^24.10.1",
     "@types/pg": "^8.15.6",
-    "prisma": "^7.0.0"
+    "prisma": "^6.19.0"
   }
 }

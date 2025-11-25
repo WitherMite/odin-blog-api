@@ -4,9 +4,12 @@ import bcrypt from "bcryptjs";
 const get = async (req, res) => {
   const id = Number(req.params.userId);
 
-  const user = await prisma.user.findUnique({ where: { id } });
+  const user = await prisma.user.findUnique({
+    where: { id },
+    omit: { password: true },
+  });
 
-  res.json({ id: user.id, username: user.username, isAuthor: user.isAuthor });
+  res.json(user);
 };
 
 const post = async (req, res) => {
@@ -18,9 +21,10 @@ const post = async (req, res) => {
       username,
       password: hashedPassword,
     },
+    omit: { password: true },
   });
 
-  res.json({ id: user.id, username: user.username, isAuthor: user.isAuthor });
+  res.json(user);
 };
 
 const put = async (req, res) => {
@@ -38,14 +42,11 @@ const put = async (req, res) => {
   const user = await prisma.user.update({
     where: { id },
     data,
+    omit: { password: true },
   });
 
   res.json({
-    updatedUser: {
-      id: user.id,
-      username: user.username,
-      isAuthor: user.isAuthor,
-    },
+    user,
     passwordUpdated: !!hashedPassword,
   });
 };
@@ -53,9 +54,12 @@ const put = async (req, res) => {
 const del = async (req, res) => {
   const id = Number(req.params.userId);
 
-  await prisma.user.delete({ where: { id } });
+  const user = await prisma.user.delete({
+    where: { id },
+    omit: { password: true },
+  });
 
-  res.json({ message: `deleted user ${id}` });
+  res.json({ message: `deleted user ${id}`, user });
 };
 
 export default { get, post, put, del };

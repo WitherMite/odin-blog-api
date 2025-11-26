@@ -7,6 +7,10 @@ const get = async (req, res) => {
   const user = await prisma.user.findUnique({
     where: { id },
     omit: { password: true },
+    include: {
+      posts: true,
+      comments: true,
+    },
   });
 
   res.json(user);

@@ -11,19 +11,19 @@ const get = async (req, res) => {
 const post = async (req, res) => {
   // TODO: allow to instantly publish a created post
   const { title, content } = req.body;
-  const { authorId } = req.body; // TODO: get from authenticated user instead
+  const authorId = Number(req.body.authorId); // TODO: get from authenticated user instead
 
   const post = await prisma.post.create({
-    data: { title, content, connect: { id: authorId } },
+    data: { title, content, author: { connect: { id: authorId } } },
   });
 
   res.json(post);
 };
 
 const put = async (req, res) => {
-  // TODO: allow publihing
+  // TODO: allow publishing
   const { title, content } = req.body;
-  const id = req.params.postId;
+  const id = Number(req.params.postId);
 
   const post = await prisma.post.update({
     where: { id },
@@ -38,7 +38,7 @@ const put = async (req, res) => {
 };
 
 const del = async (req, res) => {
-  const id = req.params.postId;
+  const id = Number(req.params.postId);
 
   const deletedComments = await prisma.comment.deleteMany({
     where: { postId: id },

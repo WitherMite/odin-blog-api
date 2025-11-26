@@ -15,8 +15,8 @@ const get = async (req, res, next) => {
 const post = async (req, res, next) => {
   try {
     // TODO: allow to instantly publish a created post
-    const { title, content } = req.body;
     const authorId = Number(req.body.authorId); // TODO: get from authenticated user instead
+    const { title, content } = req.body;
 
     const post = await prisma.post.create({
       data: { title, content, author: { connect: { id: authorId } } },
@@ -60,7 +60,6 @@ const del = async (req, res, next) => {
     const post = await prisma.post.delete({ where: { id } });
 
     res.json({
-      message: `deleted post ${id} and it's ${deletedComments.count} comments`,
       post,
       deletedComments,
     });

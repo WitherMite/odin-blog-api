@@ -73,12 +73,18 @@ const del = async (req, res, next) => {
   try {
     const id = Number(req.params.userId);
 
+    const deletedPosts = await prisma.post.deleteMany({
+      where: { authorId: id },
+    });
+    const deletedComments = await prisma.comment.deleteMany({
+      where: { userId: id },
+    });
     const user = await prisma.user.delete({
       where: { id },
       omit: { password: true },
     });
 
-    res.json({ message: `deleted user ${id}`, user });
+    res.json({ user, deletedPosts, deletedComments });
   } catch (err) {
     next(err);
   }

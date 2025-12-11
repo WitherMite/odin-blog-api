@@ -3,7 +3,7 @@ import prisma from "../config/prisma.js";
 const get = async (req, res, next) => {
   try {
     // grab queries from req
-    const postId = Number(req.params.postId);
+    const { postId } = req.clientInput;
     // get filtered comment(s) from db
     const comments = await prisma.comment.findMany({
       where: {
@@ -19,9 +19,8 @@ const get = async (req, res, next) => {
 
 const post = async (req, res, next) => {
   try {
-    const postId = Number(req.params.postId);
     const userId = Number(req.body.userId); // TODO: get from authenticated user instead
-    const { content } = req.body;
+    const { postId, content } = req.clientInput;
 
     const comment = await prisma.comment.create({
       data: {
@@ -39,11 +38,10 @@ const post = async (req, res, next) => {
 
 const put = async (req, res, next) => {
   try {
-    const id = Number(req.params.commentId);
-    const { content } = req.body;
+    const { commentId, content } = req.clientInput;
 
     const comment = await prisma.comment.update({
-      where: { id },
+      where: { id: commentId },
       data: { content, edits: { increment: 1 } },
     });
 
@@ -55,9 +53,9 @@ const put = async (req, res, next) => {
 
 const del = async (req, res, next) => {
   try {
-    const id = Number(req.params.commentId);
+    const { commentId } = req.clientInput;
 
-    const comment = await prisma.comment.delete({ where: { id } });
+    const comment = await prisma.comment.delete({ where: { id: commentId } });
 
     res.json(comment);
   } catch (err) {

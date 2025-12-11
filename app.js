@@ -1,14 +1,14 @@
 import "dotenv/config";
-import Express from "express";
+import express from "express";
 import userRouter from "./routes/userRouter.js";
 import postRouter from "./routes/postRouter.js";
 import catch404 from "./errorHandlers/catch404.js";
 import sendErrorJSON from "./errorHandlers/sendErrorJSON.js";
 
 const PORT = process.env.PORT || 3000;
-const app = Express();
+const app = express();
 
-app.use(Express.json());
+app.use(express.json());
 
 app.use("/users", userRouter);
 app.use("/posts", postRouter);

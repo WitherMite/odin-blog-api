@@ -1,18 +1,23 @@
+import HttpError from "../errorHandlers/HttpError.js";
 import prisma from "../config/prisma.js";
 import bcrypt from "bcryptjs";
 
+// change to get one or more users public data, or to get exactly one user's detailed data
 const get = async (req, res, next) => {
   try {
-    const id = Number(req.params.userId);
+    const { userId } = req.clientInput;
 
     const user = await prisma.user.findUnique({
-      where: { id },
+      where: { id: userId },
       omit: { password: true },
       include: {
         posts: true,
         comments: true,
       },
     });
+    if (!user) {
+      throw new HttpError(404, "User does not exist.", { cause: { userId } });
+    }
 
     res.json(user);
   } catch (err) {
@@ -22,7 +27,7 @@ const get = async (req, res, next) => {
 
 const post = async (req, res, next) => {
   try {
-    const { username, password } = req.body;
+    const { username, password } = req.clientInput;
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = await prisma.user.create({
@@ -41,8 +46,7 @@ const post = async (req, res, next) => {
 
 const put = async (req, res, next) => {
   try {
-    const { username, password, isAuthor } = req.body;
-    const id = Number(req.params.userId);
+    const { userId, username, password, isAuthor } = req.clientInput;
 
     const hashedPassword = password
       ? await bcrypt.hash(password, 10)
@@ -55,7 +59,7 @@ const put = async (req, res, next) => {
     };
 
     const user = await prisma.user.update({
-      where: { id },
+      where: { id: userId },
       data,
       omit: { password: true },
     });
@@ -71,16 +75,18 @@ const put = async (req, res, next) => {
 
 const del = async (req, res, next) => {
   try {
-    const id = Number(req.params.userId);
+    const { userId } = req.clientInput;
 
     const deletedPosts = await prisma.post.deleteMany({
-      where: { authorId: id },
+      where: { authorId: userId },
     });
+
     const deletedComments = await prisma.comment.deleteMany({
-      where: { userId: id },
+      where: { userId },
     });
+
     const user = await prisma.user.delete({
-      where: { id },
+      where: { id: userId },
       omit: { password: true },
     });
 

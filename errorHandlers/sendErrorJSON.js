@@ -1,15 +1,10 @@
-import HttpError from "./HttpError.js";
-
 export default function sendErrorJSON(err, req, res, next) {
-  switch (err.name) {
-    case "ServerError": {
-      console.log(new Date().toUTCString());
-      console.error(err);
-      break;
-    }
+  if (!err.statusCode || err.name === "ServerError") {
+    console.log(new Date().toUTCString());
+    console.error(err);
   }
 
-  res
-    .status(err.statusCode || 500)
-    .json({ error: { message: err.message, cause: err.cause } });
+  res.status(err.statusCode || 500).json({
+    error: { name: err.name, message: err.message, cause: err.cause },
+  });
 }

@@ -1,6 +1,5 @@
 import HttpError from "../errorHandlers/HttpError.js";
 import prisma from "../config/prisma.js";
-import bcrypt from "bcryptjs";
 
 // change to get one or more users public data, or to get exactly one user's detailed data
 const get = async (req, res, next) => {
@@ -29,11 +28,10 @@ const post = async (req, res, next) => {
   try {
     const { username, password } = req.clientInput;
 
-    const hashedPassword = await bcrypt.hash(password, 10);
     const user = await prisma.user.create({
       data: {
         username,
-        password: hashedPassword,
+        password,
       },
       omit: { password: true },
     });
@@ -48,13 +46,9 @@ const put = async (req, res, next) => {
   try {
     const { userId, username, password, isAuthor } = req.clientInput;
 
-    const hashedPassword = password
-      ? await bcrypt.hash(password, 10)
-      : undefined;
-
     const data = {
       username,
-      password: hashedPassword,
+      password,
       isAuthor,
     };
 
@@ -66,7 +60,7 @@ const put = async (req, res, next) => {
 
     res.json({
       user,
-      passwordUpdated: !!hashedPassword,
+      passwordUpdated: !!password,
     });
   } catch (err) {
     next(err);

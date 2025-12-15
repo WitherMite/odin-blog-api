@@ -38,6 +38,7 @@ const hashPassword = async (password) => await bcrypt.hash(password, 10);
 // reuseable validation chains
 // must be functions that return a new chain or array of chains for every call
 // this way the output chains can have extra validators added onto them
+
 const checkIds = (...fields) => {
   return fields.map((field) =>
     check(field).isInt().withMessage("Ids must be an integer.").toInt()
@@ -47,9 +48,9 @@ const checkIds = (...fields) => {
 const hasOne = (...fields) => {
   const chains = fields.map((field) => check(field).exists());
   return oneOf(chains, {
-    message: `Request must include at least one of these fields: ${fields.join(
-      ", "
-    )}`,
+    message: `Request must include at least one of these fields: '${fields.join(
+      "', '"
+    )}'`,
   });
 };
 
@@ -82,7 +83,37 @@ const isAuthor = () =>
     .withMessage("isAuthor must be a boolean")
     .optional();
 
+const title = () =>
+  body("title")
+    .isString()
+    .withMessage("Title must be a string")
+    .bail()
+    .trim()
+    .isLength({ min: 2, max: 50 })
+    .withMessage("Title must be between 2 and 50 characters");
+
+const postContent = () =>
+  body("content")
+    .isString()
+    .withMessage("Content must be a string")
+    .bail()
+    .trim()
+    .isLength({ min: 2 })
+    .withMessage("Content must be greater than 2 characters");
+
+const publish = () =>
+  body("publish")
+    .isBoolean()
+    .withMessage("publish must be a boolean")
+    .optional();
+
+const commentContent = () =>
+  postContent()
+    .isLength({ max: 250 })
+    .withMessage("Content must be less than 250 characters");
+
 // exported validator objects (checkValidation must come last in each middleware array)
+
 const userValidator = {
   get: [checkIds("userId"), checkValidation],
   post: [username(), password(), isAuthor(), checkValidation],
@@ -99,15 +130,22 @@ const userValidator = {
 
 const postValidator = {
   get: [checkValidation],
-  post: [checkIds("userId"), checkValidation],
-  put: [checkIds("postId"), checkValidation],
+  post: [title(), postContent(), publish(), checkValidation],
+  put: [
+    checkIds("postId"),
+    hasOne("title", "content", "publish"),
+    title().optional(),
+    postContent().optional(),
+    publish(),
+    checkValidation,
+  ],
   del: [checkIds("postId"), checkValidation],
 };
 
 const commentValidator = {
   get: [checkIds("postId"), checkValidation],
-  post: [checkIds("postId", "userId"), checkValidation],
-  put: [checkIds("postId", "commentId"), checkValidation],
+  post: [checkIds("postId"), commentContent(), checkValidation],
+  put: [checkIds("postId", "commentId"), commentContent(), checkValidation],
   del: [checkIds("postId", "commentId"), checkValidation],
 };
 

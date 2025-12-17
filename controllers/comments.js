@@ -4,7 +4,7 @@ const get = async (req, res, next) => {
   try {
     // grab queries from req
     const { postId } = req.clientInput;
-    // get filtered comment(s) from db
+    // get filtered/sorted/paginated comment(s) from db
     const comments = await prisma.comment.findMany({
       where: {
         postId,

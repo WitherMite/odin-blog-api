@@ -3,7 +3,7 @@ import prisma from "../config/prisma.js";
 const get = async (req, res, next) => {
   try {
     // grab queries from req
-    // get filtered post(s) from db
+    // get filtered/sorted/paginated post(s) from db
     const posts = await prisma.post.findMany({});
 
     res.json(posts);
@@ -14,12 +14,20 @@ const get = async (req, res, next) => {
 
 const post = async (req, res, next) => {
   try {
-    // TODO: allow to instantly publish a created post
     const authorId = req.user.id;
-    const { title, content } = req.clientInput;
+    const { title, content, publish } = req.clientInput;
+    let publishedAt;
+    if (typeof publish !== "undefined") {
+      publishedAt = publish ? new Date() : null;
+    }
 
     const post = await prisma.post.create({
-      data: { title, content, author: { connect: { id: authorId } } },
+      data: {
+        title,
+        content,
+        publishedAt,
+        author: { connect: { id: authorId } },
+      },
     });
 
     res.json(post);
@@ -30,14 +38,18 @@ const post = async (req, res, next) => {
 
 const put = async (req, res, next) => {
   try {
-    // TODO: allow publishing
-    const { postId, title, content } = req.clientInput;
+    const { postId, title, content, publish } = req.clientInput;
+    let publishedAt;
+    if (typeof publish !== "undefined") {
+      publishedAt = publish ? new Date() : null;
+    }
 
     const post = await prisma.post.update({
       where: { id: postId },
       data: {
         title,
         content,
+        publishedAt,
         edits: { increment: 1 },
       },
     });

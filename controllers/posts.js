@@ -15,7 +15,7 @@ const get = async (req, res, next) => {
 const post = async (req, res, next) => {
   try {
     // TODO: allow to instantly publish a created post
-    const authorId = Number(req.body.authorId); // TODO: get from authenticated user instead
+    const authorId = req.user.id;
     const { title, content } = req.clientInput;
 
     const post = await prisma.post.create({

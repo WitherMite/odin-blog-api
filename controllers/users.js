@@ -1,5 +1,6 @@
 import HttpError from "../errorHandlers/HttpError.js";
 import prisma from "../config/prisma.js";
+import { login } from "./authentication.js";
 
 // change to get one or more users public data, or to get exactly one user's detailed data
 const get = async (req, res, next) => {
@@ -35,8 +36,8 @@ const post = async (req, res, next) => {
       },
       omit: { password: true },
     });
-
-    res.json(user);
+    req.user = user;
+    login(req, res, next);
   } catch (err) {
     next(err);
   }

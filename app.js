@@ -2,6 +2,7 @@ import "dotenv/config";
 import express from "express";
 import userRouter from "./routes/userRouter.js";
 import postRouter from "./routes/postRouter.js";
+import authRouter from "./routes/authRouter.js";
 import catch404 from "./errorHandlers/catch404.js";
 import sendErrorJSON from "./errorHandlers/sendErrorJSON.js";
 
@@ -12,6 +13,7 @@ app.use(express.json());
 
 app.use("/users", userRouter);
 app.use("/posts", postRouter);
+app.use("/login", authRouter);
 app.use(catch404);
 app.use(sendErrorJSON);
 

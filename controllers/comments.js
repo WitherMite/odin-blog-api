@@ -19,7 +19,7 @@ const get = async (req, res, next) => {
 
 const post = async (req, res, next) => {
   try {
-    const userId = Number(req.body.userId); // TODO: get from authenticated user instead
+    const userId = req.user.id;
     const { postId, content } = req.clientInput;
 
     const comment = await prisma.comment.create({

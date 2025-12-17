@@ -11,14 +11,14 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url = env("DATABASE_URL")
+  url      = env("DATABASE_URL")
 }
 
 model User {
   id       Int       @id @default(autoincrement())
   username String    @unique
   password String
-  isAuthor Boolean @default(false)
+  isAuthor Boolean   @default(false)
   posts    Post[]
   comments Comment[]
 }

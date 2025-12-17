@@ -3,7 +3,7 @@ import prisma from "../config/prisma.js";
 import bcrypt from "bcryptjs";
 import {
   body,
-  check,
+  param,
   query,
   validationResult,
   matchedData,
@@ -41,14 +41,14 @@ const hashPassword = async (password) => await bcrypt.hash(password, 10);
 
 const checkIds = (...fields) => {
   return fields.map((field) =>
-    check(field).isInt().withMessage("Ids must be an integer.").toInt()
+    param(field).isInt().withMessage("Ids must be an integer.").toInt()
   );
 };
 
 const hasOne = (...fields) => {
-  const chains = fields.map((field) => check(field).exists());
+  const chains = fields.map((field) => body(field).exists());
   return oneOf(chains, {
-    message: `Request must include at least one of these fields: '${fields.join(
+    message: `Request body must include at least one of these fields: '${fields.join(
       "', '"
     )}'`,
   });
@@ -61,7 +61,10 @@ const username = () =>
     .bail()
     .trim()
     .isLength({ min: 2, max: 25 })
-    .withMessage("Username must be between 2 and 25 characters")
+    .withMessage("Username must be between 2 and 25 characters");
+
+const newUsername = () =>
+  username()
     .bail()
     .custom(usernameIsUnique)
     .withMessage("Username must be unique");
@@ -73,9 +76,9 @@ const password = () =>
     .bail()
     .trim()
     .isLength({ min: 7 })
-    .withMessage("Password must be at least 7 characters")
-    .bail()
-    .customSanitizer(hashPassword);
+    .withMessage("Password must be at least 7 characters");
+
+const newPassword = () => password().bail().customSanitizer(hashPassword);
 
 const isAuthor = () =>
   body("isAuthor")
@@ -114,14 +117,16 @@ const commentContent = () =>
 
 // exported validator objects (checkValidation must come last in each middleware array)
 
+const loginValidator = [username(), password(), checkValidation];
+
 const userValidator = {
   get: [checkIds("userId"), checkValidation],
-  post: [username(), password(), isAuthor(), checkValidation],
+  post: [newUsername(), newPassword(), isAuthor(), checkValidation],
   put: [
     checkIds("userId"),
     hasOne("username", "password", "isAuthor"),
-    username().optional(),
-    password().optional(),
+    newUsername().optional(),
+    newPassword().optional(),
     isAuthor(),
     checkValidation,
   ],
@@ -149,4 +154,4 @@ const commentValidator = {
   del: [checkIds("postId", "commentId"), checkValidation],
 };
 
-export { userValidator, postValidator, commentValidator };
+export { loginValidator, userValidator, postValidator, commentValidator };

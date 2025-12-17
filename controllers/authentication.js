@@ -20,6 +20,7 @@ const login = async (req, res, next) => {
 
       user = await prisma.user.findUnique({
         where: { username },
+        omit: { password: false },
       });
 
       const matches = await bcrypt.compare(password, user.password);

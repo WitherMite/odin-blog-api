@@ -9,7 +9,6 @@ const get = async (req, res, next) => {
 
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      omit: { password: true },
       include: {
         posts: true,
         comments: true,
@@ -34,7 +33,6 @@ const post = async (req, res, next) => {
         username,
         password,
       },
-      omit: { password: true },
     });
     req.user = user;
     login(req, res, next);
@@ -56,7 +54,6 @@ const put = async (req, res, next) => {
     const user = await prisma.user.update({
       where: { id: userId },
       data,
-      omit: { password: true },
     });
 
     res.json({
@@ -82,7 +79,6 @@ const del = async (req, res, next) => {
 
     const user = await prisma.user.delete({
       where: { id: userId },
-      omit: { password: true },
     });
 
     res.json({ user, deletedPosts, deletedComments });

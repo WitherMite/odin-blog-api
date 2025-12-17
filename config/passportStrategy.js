@@ -13,7 +13,6 @@ const verify = async (jwtPayload, done) => {
     const user = await prisma.user.findUnique({
       where: { username: jwtPayload.username },
       include: { posts: { include: { comments: true } }, comments: true },
-      omit: { password: true },
     });
     if (user) {
       return done(null, user);

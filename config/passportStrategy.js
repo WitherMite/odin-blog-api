@@ -17,7 +17,9 @@ const verify = async (jwtPayload, done) => {
     if (user) {
       return done(null, user);
     } else {
-      return done(null, false, { message: "No valid JWT provided." });
+      return done(null, false, {
+        message: "No user associated with token provided.",
+      });
     }
   } catch (err) {
     return done(err);

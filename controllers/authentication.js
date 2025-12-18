@@ -22,11 +22,14 @@ const login = async (req, res, next) => {
         where: { username },
         omit: { password: false },
       });
+      if (!user) {
+        throw new HttpError(401, "Username or password invalid");
+      }
 
       const matches = await bcrypt.compare(password, user.password);
       user.password = undefined;
       if (!matches) {
-        throw new HttpError(401, "Password invalid");
+        throw new HttpError(401, "Username or password invalid");
       }
     }
     const token = createToken({ username: user.username });
